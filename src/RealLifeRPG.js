@@ -35,8 +35,8 @@ const RealLifeRPG = () => {
 
     // Default data if nothing is saved
     return {
-      level: 5,
-      exp: 23,
+      level: 1, // Changed from 5 to 1
+      exp: 0, // Changed from 23 to 0
       jobClass: "Swordsman",
       job: "Novice",
       totalTimeTrackedSeconds: 0, // Starting at 00:00:00
@@ -160,6 +160,17 @@ const RealLifeRPG = () => {
         if (sessionTime > 0 && sessionTime % 60 === 0) {
           // Update daily tracked minutes
           setDailyTrackedMinutes((prev) => prev + 1);
+
+          // Add exp every minute (20 exp per minute = 100 exp per 5 minutes)
+          setExp((prevExp) => {
+            const newExp = prevExp + 20;
+            if (newExp >= expToLevel) {
+              // If exp reaches the threshold, reset it and level up
+              gainLevel();
+              return newExp - expToLevel; // Carry over excess exp
+            }
+            return newExp;
+          });
 
           // Check for level gain (every 5 minutes = 300 seconds)
           if (sessionTime % 300 === 0) {
