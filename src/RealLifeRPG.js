@@ -10,8 +10,7 @@ import {
   Save,
   Clock,
 } from "lucide-react";
-import CharacterImage from './components/CharacterImage';
-import DevTestPanel from './components/DevTestPanel';
+import CharacterImage from "./components/CharacterImage";
 
 const RealLifeRPG = () => {
   // Load saved data from localStorage or use defaults
@@ -498,48 +497,6 @@ const RealLifeRPG = () => {
     100
   );
 
-  // Testing functions for the DevTestPanel
-  const handleSkipMinutes = (minutes) => {
-    // Calculate how many levels this would add (5 minutes = 1 level)
-    const levelsToAdd = Math.floor(minutes / 5);
-    const remainingMinutes = minutes % 5;
-    
-    // Add to daily tracked minutes
-    setDailyTrackedMinutes(prev => prev + minutes);
-    
-    // Add to total tracked seconds
-    setTotalTimeTrackedSeconds(prev => prev + (minutes * 60));
-    
-    // Process level changes
-    const newLevel = level + levelsToAdd;
-    setLevel(newLevel);
-    
-    // Update levels gained
-    setLevelsGained(prev => prev + levelsToAdd);
-    
-    // Set exp based on remaining minutes (20 exp per minute)
-    const newExp = remainingMinutes * 20;
-    setExp(newExp);
-    
-    // Update job if needed
-    updateJobBasedOnLevel(newLevel, jobClass);
-    
-    console.log(`Skipped ${minutes} minutes, added ${levelsToAdd} levels. New level: ${newLevel}`);
-  };
-
-  const handleSetLevel = (newLevel) => {
-    // Ensure level is at least 1
-    newLevel = Math.max(1, newLevel);
-    
-    // Set the new level
-    setLevel(newLevel);
-    
-    // Update job if needed
-    updateJobBasedOnLevel(newLevel, jobClass);
-    
-    console.log(`Set level to ${newLevel}, new job: ${job}`);
-  };
-
   return (
     <div className="font-sans p-4 max-w-md mx-auto bg-gray-100 rounded-lg shadow-md">
       {/* Header with Save Button */}
@@ -560,15 +517,6 @@ const RealLifeRPG = () => {
           </button>
         </div>
       </div>
-
-      {/* Developer Testing Panel - Remove before production */}
-      <DevTestPanel 
-        onSkipMinutes={handleSkipMinutes}
-        onSetLevel={handleSetLevel}
-        currentLevel={level}
-        currentJob={job}
-        onReset={resetTimer}
-      />
 
       {/* Character Info & Class Selector */}
       <div className="bg-white p-4 rounded-lg mb-4 shadow">
@@ -780,13 +728,13 @@ const RealLifeRPG = () => {
 
         {/* Character Image - Centered with better positioning */}
         <div className="absolute inset-0 flex justify-center items-center">
-          <CharacterImage 
-            job={job} 
-            jobClass={jobClass} 
-            level={level} 
+          <CharacterImage
+            job={job}
+            jobClass={jobClass}
+            level={level}
             className="max-h-80 max-w-full object-contain"
-            showLevel={false} 
-            enableAnimation={true} 
+            showLevel={false}
+            enableAnimation={true}
           />
         </div>
 
