@@ -81,6 +81,7 @@ const RealLifeRPG = () => {
   // References for timer
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
+  const lastProcessedMinuteRef = useRef(-1); // Move this to the top level
 
   // Reset confirmation
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -142,52 +143,74 @@ const RealLifeRPG = () => {
     }
   };
 
-  // Timer effect - completely rewritten for reliability
+  // Also add this state for tracking session start
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+
+  // Completely rewrite the timer toggle function
+  const toggleTimer = () => {
+    if (isTimerRunning) {
+      // Stopping timer
+      setTotalTimeTrackedSeconds((prev) => prev + elapsedSeconds);
+      setSessionStartTime(null);
+      setTimeout(() => saveData(), 100);
+    } else {
+      // Starting timer
+      setElapsedSeconds(0);
+      setSessionStartTime(Date.now());
+    }
+    setIsTimerRunning(!isTimerRunning);
+  };
+
+  // Complete rewrite of the timer effect
   useEffect(() => {
     if (isTimerRunning) {
-      // Record the start time of this session
-      startTimeRef.current = Date.now();
+      // Make sure we have a valid start time
+      if (!sessionStartTime) {
+        setSessionStartTime(Date.now());
+      }
 
       timerRef.current = setInterval(() => {
-        // Calculate current session time
-        const sessionTime = Math.floor(
-          (Date.now() - startTimeRef.current) / 1000
-        );
-        // Update elapsed seconds for this session
-        setElapsedSeconds(sessionTime);
+        // Calculate elapsed time since session start
+        const now = Date.now();
+        const sessionSeconds = Math.floor((now - sessionStartTime) / 1000);
+        setElapsedSeconds(sessionSeconds);
 
-        // Check for minute increments (every 60 seconds)
-        if (sessionTime > 0 && sessionTime % 60 === 0) {
-          // Update daily tracked minutes
-          setDailyTrackedMinutes((prev) => prev + 1);
+        // Calculate how many minutes have passed in total
+        const totalSessionMinutes = Math.floor(sessionSeconds / 60);
 
-          // Add exp every minute (20 exp per minute = 100 exp per 5 minutes)
-          setExp((prevExp) => {
-            const newExp = prevExp + 20;
-            if (newExp >= expToLevel) {
-              // If exp reaches the threshold, reset it and level up
-              gainLevel();
-              return newExp - expToLevel; // Carry over excess exp
-            }
-            return newExp;
-          });
+        // Calculate expected level and exp based on minutes
+        const expectedLevel = 1 + Math.floor(totalSessionMinutes / 5); // 1 level per 5 minutes
+        const expectedExp = (totalSessionMinutes % 5) * 20; // 20 exp per minute, cap at 100
 
-          // Check for level gain (every 5 minutes = 300 seconds)
-          if (sessionTime % 300 === 0) {
-            gainLevel();
-          }
+        // Update daily tracked minutes directly
+        setDailyTrackedMinutes(totalSessionMinutes);
+
+        // If we need to level up
+        if (expectedLevel > level) {
+          // Calculate how many levels to gain
+          const levelsToGain = expectedLevel - level;
+
+          // Update levels gained today
+          setLevelsGained((prev) => prev + levelsToGain);
+
+          // Set the new level
+          setLevel(expectedLevel);
+
+          // Update job based on new level
+          updateJobBasedOnLevel(expectedLevel, jobClass);
         }
+
+        // Set exp to the expected value
+        setExp(expectedExp);
       }, 1000);
     } else {
-      // Just clear the timer interval - we'll update totalTime in toggleTimer
       clearInterval(timerRef.current);
     }
 
-    // Cleanup on unmount
     return () => {
       clearInterval(timerRef.current);
     };
-  }, [isTimerRunning]);
+  }, [isTimerRunning, sessionStartTime, level, jobClass]);
 
   // Function to gain a level
   const gainLevel = () => {
@@ -412,24 +435,7 @@ const RealLifeRPG = () => {
     setJob(currentJob);
   };
 
-  const toggleTimer = () => {
-    // If we're stopping the timer
-    if (isTimerRunning) {
-      // Add current session time to total time
-      setTotalTimeTrackedSeconds((prev) => prev + elapsedSeconds);
-
-      // Save progress
-      setTimeout(() => saveData(), 100);
-    } else {
-      // Starting the timer, reset session time
-      setElapsedSeconds(0);
-    }
-
-    // Toggle timer state
-    setIsTimerRunning(!isTimerRunning);
-  };
-
-  // Reset timer functionality
+  // Reset exp and level when the timer is reset
   const resetTimer = () => {
     // Stop timer if running
     if (isTimerRunning) {
@@ -441,6 +447,8 @@ const RealLifeRPG = () => {
     setElapsedSeconds(0);
     setDailyTrackedMinutes(0);
     setLevelsGained(0);
+    setLevel(1); // Reset level to 1
+    setExp(0); // Reset exp to 0
 
     // Save the reset state
     setTimeout(() => saveData(), 100);
