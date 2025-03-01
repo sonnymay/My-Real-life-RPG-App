@@ -639,10 +639,12 @@ const RealLifeRPG = () => {
         </div>
 
         <div className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100">
-          <div className="flex justify-between items-center">
-            <span>Novice</span>
-            <span>{jobClass === "Novice" ? "Novice" : jobClass}</span>
-            <span>
+          <div className="grid grid-cols-6 mb-1 gap-1 text-center">
+            <span className="truncate">Novice</span>
+            <span className="truncate">
+              {jobClass === "Novice" ? "Novice" : jobClass}
+            </span>
+            <span className="truncate">
               {jobClass === "Swordsman"
                 ? "Knight"
                 : jobClass === "Archer"
@@ -657,7 +659,7 @@ const RealLifeRPG = () => {
                 ? "Blacksmith"
                 : ""}
             </span>
-            <span>
+            <span className="truncate">
               {jobClass === "Swordsman"
                 ? "Lord Knight"
                 : jobClass === "Archer"
@@ -665,41 +667,41 @@ const RealLifeRPG = () => {
                 : jobClass === "Mage"
                 ? "High Wizard"
                 : jobClass === "Thief"
-                ? "Guillotine Cross"
+                ? "G. Cross"
                 : jobClass === "Acolyte"
                 ? "High Priest"
                 : jobClass === "Merchant"
                 ? "Whitesmith"
                 : ""}
             </span>
-            <span>
+            <span className="truncate">
               {jobClass === "Swordsman"
                 ? "Rune Knight"
                 : jobClass === "Archer"
-                ? "Falcon Ranger"
+                ? "F. Ranger"
                 : jobClass === "Mage"
                 ? "Archmage"
                 : jobClass === "Thief"
-                ? "Shadow Reaper"
+                ? "S. Reaper"
                 : jobClass === "Acolyte"
-                ? "Divine Cleric"
+                ? "D. Cleric"
                 : jobClass === "Merchant"
-                ? "Titan Forgemaster"
+                ? "T. Forger"
                 : ""}
             </span>
-            <span>
+            <span className="truncate">
               {jobClass === "Swordsman"
-                ? "Eternal Knight"
+                ? "E. Knight"
                 : jobClass === "Archer"
-                ? "Eternal Marksman"
+                ? "E. Marksman"
                 : jobClass === "Mage"
-                ? "Eternal Sorcerer"
+                ? "E. Sorcerer"
                 : jobClass === "Thief"
-                ? "Eternal Phantom"
+                ? "E. Phantom"
                 : jobClass === "Acolyte"
-                ? "Eternal Saint"
+                ? "E. Saint"
                 : jobClass === "Merchant"
-                ? "Eternal Tycoon"
+                ? "E. Tycoon"
                 : ""}
             </span>
           </div>
